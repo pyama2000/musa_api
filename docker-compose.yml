@@ -1,0 +1,21 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/mysql/:/var/lib/mysql
+    container_name: mysql
+  rust:
+    build:
+      context: .
+    environment:
+      USER: root
+    volumes:
+      - ./:/musa_diesel
+    depends_on:
+      - mysql
+    container_name: rust
