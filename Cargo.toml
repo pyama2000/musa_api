@@ -1,0 +1,9 @@
+[package]
+name = "musa_diesel"
+version = "0.1.0"
+authors = ["T.YAMASHITA <8256tako@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
