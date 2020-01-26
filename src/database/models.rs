@@ -1,10 +1,17 @@
 use super::schema::*;
 
-#[derive(Clone, Debug, Default, Queryable)]
+#[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct Credential {
     id: i32,
     user_id: String,
-    token_id: String,
+    token_id: i32,
+}
+
+#[derive(Clone, Debug, Default, Insertable)]
+#[table_name = "credentials"]
+pub struct NewCredential {
+    pub user_id: String,
+    pub token_id: i32,
 }
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]

@@ -1,7 +1,8 @@
 mod models;
 mod schema;
-mod token;
-mod user;
+pub mod token;
+pub mod user;
+pub mod credential;
 
 use std::env;
 
