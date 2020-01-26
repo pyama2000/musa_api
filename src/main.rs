@@ -1,5 +1,11 @@
 use actix_redis::RedisSession;
-use actix_web::{middleware, App, HttpServer};
+use actix_web::{
+    middleware::{DefaultHeaders, Logger},
+    web::{get, resource},
+    App, HttpServer,
+};
+
+mod login;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -11,9 +17,11 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(RedisSession::new("127.0.0.1:6379", &[0; 32]))
-            .wrap(middleware::Logger::default())
+            .wrap(DefaultHeaders::new().header("Access-Control-Allow-Origin", "*"))
+            .wrap(Logger::default())
+            .service(resource("/auth").route(get().to(login::get_login_url)))
     })
-    .bind("127.0.0.1:8080")?
+    .bind("127.0.0.1:8000")?
     .run()
     .await
 }
