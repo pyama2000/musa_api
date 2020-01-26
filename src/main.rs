@@ -5,6 +5,7 @@ use actix_web::{
     App, HttpServer,
 };
 
+mod database;
 mod login;
 
 #[actix_rt::main]
