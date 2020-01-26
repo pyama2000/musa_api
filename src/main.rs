@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate diesel;
+
 use actix_redis::RedisSession;
 use actix_web::{
     middleware::{DefaultHeaders, Logger},
