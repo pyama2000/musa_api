@@ -26,5 +26,8 @@ services:
     depends_on:
       - mysql
       - redis
+    links:
+      - mysql
+      - redis
     container_name: rust
 
