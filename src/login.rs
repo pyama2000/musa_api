@@ -1,6 +1,6 @@
 use actix_session::Session;
 use actix_web::{web::Query, HttpResponse, Result};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use spotify_api::{
     authentication::{request_tokens, Scope, SpotifyOAuth},
     user::UserClient,
