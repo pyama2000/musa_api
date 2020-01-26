@@ -1,10 +1,10 @@
-mod login;
 mod models;
 mod schema;
+mod user;
 
 use std::env;
 
-use diesel::{mysql::MysqlConnection, prelude::*};
+use diesel::{prelude::*, MysqlConnection};
 use dotenv::dotenv;
 
 pub fn establish_connection() -> MysqlConnection {

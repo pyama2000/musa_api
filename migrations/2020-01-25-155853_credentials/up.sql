@@ -12,7 +12,6 @@ CREATE TABLE credentials (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
   user_id VARCHAR(255) NOT NULL,
   token_id INTEGER NOT NULL,
-  last_access DATETIME NOT NULL,
   FOREIGN KEY (user_id)
   REFERENCES users(id),
   FOREIGN KEY (token_id)
