@@ -1,8 +1,8 @@
+pub mod credential;
 mod models;
 mod schema;
 pub mod token;
 pub mod user;
-pub mod credential;
 
 use std::env;
 
