@@ -1,7 +1,7 @@
 table! {
-    sessions (id) {
+    credentials (id) {
         id -> Integer,
-        session_id -> Integer,
+        user_id -> Varchar,
         token_id -> Integer,
         last_access -> Datetime,
     }
@@ -10,14 +10,22 @@ table! {
 table! {
     tokens (id) {
         id -> Integer,
-        access_token -> Text,
-        refresh_token -> Text,
+        access_token -> Varchar,
+        refresh_token -> Varchar,
     }
 }
 
-joinable!(sessions -> tokens (token_id));
+table! {
+    users (id) {
+        id -> Varchar,
+    }
+}
+
+joinable!(credentials -> tokens (token_id));
+joinable!(credentials -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
-    sessions,
+    credentials,
     tokens,
+    users,
 );
