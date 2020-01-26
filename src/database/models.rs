@@ -2,9 +2,9 @@ use super::schema::*;
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct Credential {
-    id: i32,
-    user_id: String,
-    token_id: i32,
+    pub id: i32,
+    pub user_id: String,
+    pub token_id: i32,
 }
 
 #[derive(Clone, Debug, Default, Insertable)]
@@ -16,9 +16,9 @@ pub struct NewCredential {
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct Token {
-    id: i32,
-    access_token: String,
-    refresh_token: String,
+    pub id: i32,
+    pub access_token: String,
+    pub refresh_token: String,
 }
 
 #[derive(Clone, Debug, Default, Insertable)]
@@ -30,7 +30,7 @@ pub struct NewToken {
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct User {
-    id: String,
+    pub id: String,
 }
 
 #[derive(Clone, Debug, Default, Insertable)]
