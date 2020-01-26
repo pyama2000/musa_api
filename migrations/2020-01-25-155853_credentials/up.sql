@@ -1,14 +1,19 @@
 CREATE TABLE tokens (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
-  access_token TEXT NOT NULL,
-  refresh_token TEXT NOT NULL
+  access_token VARCHAR(255) NOT NULL,
+  refresh_token VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE sessions (
+CREATE TABLE users (
+  id VARCHAR(255) PRIMARY KEY
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE credentials (
   id INTEGER AUTO_INCREMENT PRIMARY KEY,
-  session_id INTEGER NOT NULL,
+  user_id VARCHAR(255) NOT NULL,
   token_id INTEGER NOT NULL,
-  last_access DATETIME NOT NULL,
+  FOREIGN KEY (user_id)
+  REFERENCES users(id),
   FOREIGN KEY (token_id)
   REFERENCES tokens(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
