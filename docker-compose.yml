@@ -9,6 +9,13 @@ services:
     volumes:
       - ./docker/mysql/:/var/lib/mysql
     container_name: mysql
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    volumes:
+      - ./docker/redis/data:/data
+    container_name: redis
   rust:
     build:
       context: .
@@ -18,4 +25,6 @@ services:
       - ./:/musa_diesel
     depends_on:
       - mysql
+      - redis
     container_name: rust
+
