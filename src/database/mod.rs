@@ -1,5 +1,6 @@
 mod models;
 mod schema;
+mod token;
 mod user;
 
 use std::env;

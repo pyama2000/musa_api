@@ -11,7 +11,14 @@ pub struct Credential {
 pub struct Token {
     id: i32,
     access_token: String,
-    token_id: String,
+    refresh_token: String,
+}
+
+#[derive(Clone, Debug, Default, Insertable)]
+#[table_name = "tokens"]
+pub struct NewToken {
+    pub access_token: String,
+    pub refresh_token: String,
 }
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
