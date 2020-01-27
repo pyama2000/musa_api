@@ -1,14 +1,14 @@
 table! {
     credentials (id) {
-        id -> Integer,
+        id -> Int4,
         user_id -> Varchar,
-        token_id -> Integer,
+        token_id -> Int4,
     }
 }
 
 table! {
     tokens (id) {
-        id -> Integer,
+        id -> Int4,
         access_token -> Varchar,
         refresh_token -> Varchar,
     }
@@ -23,4 +23,8 @@ table! {
 joinable!(credentials -> tokens (token_id));
 joinable!(credentials -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(credentials, tokens, users,);
+allow_tables_to_appear_in_same_query!(
+    credentials,
+    tokens,
+    users,
+);
