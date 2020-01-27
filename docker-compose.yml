@@ -1,14 +1,17 @@
 version: '3'
 services:
-  mysql:
-    image: mysql:5.7
+  postgres:
+    image: postgres:alpine
     environment:
-      MYSQL_ROOT_PASSWORD: password
-    ports:
-      - 3306:3306
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: musa
+      LANG: ja_JP.utf8
+    ports: 
+      - 5432:5432
     volumes:
-      - ./docker/mysql/:/var/lib/mysql
-    container_name: mysql
+      - ./docker/postgres/data:/var/lib/postgres/data
+    container_name: postgres
   redis:
     image: redis:latest
     ports:
@@ -24,10 +27,10 @@ services:
     volumes:
       - ./:/musa_diesel
     depends_on:
-      - mysql
+      - postgres 
       - redis
     links:
-      - mysql
+      - postgres
       - redis
     container_name: rust
 
