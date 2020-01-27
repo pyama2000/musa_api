@@ -1,10 +1,10 @@
-use diesel::{mysql::MysqlConnection, prelude::*};
+use diesel::prelude::*;
 
 use super::models::{NewUser, User};
 use super::schema;
 
-pub fn create_user(connection: &MysqlConnection, user_id: &str) -> User {
-    use schema::users::dsl::{id, users};
+pub fn create_user(connection: &PgConnection, user_id: &str) -> User {
+    use schema::users::dsl::users;
 
     let user = NewUser {
         id: user_id.to_owned(),
@@ -12,8 +12,6 @@ pub fn create_user(connection: &MysqlConnection, user_id: &str) -> User {
 
     diesel::insert_into(users)
         .values(&user)
-        .execute(connection)
-        .expect("Error saving user");
-
-    users.order(id.desc()).first(connection).unwrap()
+        .get_result(connection)
+        .expect("Error saving user")
 }

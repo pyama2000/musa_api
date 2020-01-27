@@ -1,14 +1,14 @@
-use diesel::{mysql::MysqlConnection, prelude::*};
+use diesel::prelude::*;
 
 use super::models::{NewToken, Token};
 use super::schema;
 
 pub fn create_token(
-    connection: &MysqlConnection,
+    connection: &PgConnection,
     access_token: &str,
     refresh_token: &str,
 ) -> Token {
-    use schema::tokens::dsl::{id, tokens};
+    use schema::tokens::dsl::tokens;
 
     let token = NewToken {
         access_token: access_token.to_owned(),
@@ -17,8 +17,6 @@ pub fn create_token(
 
     diesel::insert_into(tokens)
         .values(&token)
-        .execute(connection)
-        .expect("Error saving token");
-
-    tokens.order(id.desc()).first(connection).unwrap()
+        .get_result(connection)
+        .expect("Error saving token")
 }
