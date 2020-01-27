@@ -22,8 +22,8 @@ services:
   rust:
     build:
       context: .
-    environment:
-      USER: root
+    ports:
+      - 8000:8000
     volumes:
       - ./:/musa_diesel
     depends_on:
