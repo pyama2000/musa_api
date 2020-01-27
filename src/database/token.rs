@@ -3,11 +3,7 @@ use diesel::prelude::*;
 use super::models::{NewToken, Token};
 use super::schema;
 
-pub fn create_token(
-    connection: &PgConnection,
-    access_token: &str,
-    refresh_token: &str,
-) -> Token {
+pub fn create_token(connection: &PgConnection, access_token: &str, refresh_token: &str) -> Token {
     use schema::tokens::dsl::tokens;
 
     let token = NewToken {
