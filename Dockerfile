@@ -2,11 +2,8 @@ FROM rust:latest
 
 WORKDIR /musa_diesel
 
-# RUN apt update -y && apt upgrade -y && \
-#     apt install -y mysql-client && \
-#     cargo install diesel_cli --no-default-features --features mysql
-
 RUN cargo install diesel_cli --no-default-features --features postgres && \
-    cargo install cargo-watch
+    cargo install cargo-watch && \
+    rustup component add clippy
 
-CMD ["cargo", "watch", "-x", "run"]
+CMD ["cargo", "watch", "-x", "clippy", "-x", "run"]
