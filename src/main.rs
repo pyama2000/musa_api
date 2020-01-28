@@ -22,7 +22,7 @@ async fn main() -> std::io::Result<()> {
     env::set_var("RUST_LOG", "actix_web=info,actix_redis=info");
     env_logger::init();
 
-    let redis_url = env::var("REDIS_URL").expect("REDIS_URL must be set");
+    let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "redis:6379".to_owned());
 
     HttpServer::new(move || {
         App::new()
