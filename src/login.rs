@@ -9,7 +9,7 @@ use spotify_api::{
 use crate::database;
 
 #[derive(Deserialize)]
-pub struct Identity {
+pub struct Callback {
     code: String,
 }
 
@@ -40,7 +40,7 @@ pub async fn get_login_url() -> String {
     oauth.generate_auth_url().unwrap()
 }
 
-pub async fn login(Query(code): Query<Identity>, session: Session) -> Result<HttpResponse> {
+pub async fn login(Query(code): Query<Callback>, session: Session) -> Result<HttpResponse> {
     let tokens = request_tokens(&code.code).unwrap();
 
     let access_token = &tokens.access_token;
@@ -57,6 +57,8 @@ pub async fn login(Query(code): Query<Identity>, session: Session) -> Result<Htt
         let _ = database::user::create_user(&connection, &user_id);
         let token = database::token::create_token(&connection, access_token, refresh_token);
         let _ = database::credential::create_credential(&connection, &user_id, token.id);
+
+        return Ok(HttpResponse::Created().finish())
     }
 
     session.set("user_id", &user_id)?;
