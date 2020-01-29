@@ -53,7 +53,6 @@ pub async fn login(Query(code): Query<Identity>, session: Session) -> Result<Htt
     let connection = database::establish_connection();
 
     let user = database::user::find_user(&connection, &user_id).unwrap();
-    dbg!(&user);
     if user.is_none() {
         let _ = database::user::create_user(&connection, &user_id);
         let token = database::token::create_token(&connection, access_token, refresh_token);
