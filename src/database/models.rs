@@ -1,5 +1,10 @@
 use super::schema::*;
 
+pub trait Selectable {
+    type Columns;
+    fn columns() -> Self::Columns;
+}
+
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct Credential {
     pub id: i32,
@@ -32,6 +37,14 @@ pub struct NewToken {
 pub struct User {
     pub id: i32,
     pub user_id: String,
+}
+
+impl Selectable for User {
+    type Columns = (users::id, users::user_id);
+
+    fn columns() -> Self::Columns {
+        (users::id, users::user_id)
+    }
 }
 
 #[derive(Clone, Debug, Default, Insertable)]
