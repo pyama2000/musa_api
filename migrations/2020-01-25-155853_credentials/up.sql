@@ -11,8 +11,8 @@ CREATE TABLE users (
 
 CREATE TABLE credentials (
   id SERIAL PRIMARY KEY,
-  user_id VARCHAR(255) NOT NULL,
-  token_id INTEGER NOT NULL,
+  user_id VARCHAR(255) NOT NULL UNIQUE,
+  token_id INTEGER NOT NULL UNIQUE,
   FOREIGN KEY (user_id)
   REFERENCES users(user_id),
   FOREIGN KEY (token_id)
