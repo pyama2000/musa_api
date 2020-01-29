@@ -51,9 +51,14 @@ pub async fn login(Query(code): Query<Identity>, session: Session) -> Result<Htt
         .id;
 
     let connection = database::establish_connection();
-    let _ = database::user::create_user(&connection, &user_id);
-    let token = database::token::create_token(&connection, access_token, refresh_token);
-    let _ = database::credential::create_credential(&connection, &user_id, token.id);
+
+    let user = database::user::find_user(&connection, &user_id).unwrap();
+    dbg!(&user);
+    if user.is_none() {
+        let _ = database::user::create_user(&connection, &user_id);
+        let token = database::token::create_token(&connection, access_token, refresh_token);
+        let _ = database::credential::create_credential(&connection, &user_id, token.id);
+    }
 
     session.set("user_id", &user_id)?;
     session.renew();
