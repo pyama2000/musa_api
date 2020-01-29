@@ -5,7 +5,8 @@ CREATE TABLE tokens (
 );
 
 CREATE TABLE users (
-  id VARCHAR(255) PRIMARY KEY
+  id SERIAL PRIMARY KEY,
+  user_id VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE credentials (
@@ -13,7 +14,7 @@ CREATE TABLE credentials (
   user_id VARCHAR(255) NOT NULL,
   token_id INTEGER NOT NULL,
   FOREIGN KEY (user_id)
-  REFERENCES users(id),
+  REFERENCES users(user_id),
   FOREIGN KEY (token_id)
   REFERENCES tokens(id)
 );
