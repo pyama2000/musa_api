@@ -30,11 +30,12 @@ pub struct NewToken {
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct User {
-    pub id: String,
+    pub id: i32,
+    pub user_id: String,
 }
 
 #[derive(Clone, Debug, Default, Insertable)]
 #[table_name = "users"]
 pub struct NewUser {
-    pub id: String,
+    pub user_id: String,
 }
