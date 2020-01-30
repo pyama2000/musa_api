@@ -20,7 +20,7 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     better_panic::install();
 
-    env::set_var("RUST_LOG", "actix_web=info,actix_redis=info");
+    env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
     HttpServer::new(move || {
