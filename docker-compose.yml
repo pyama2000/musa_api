@@ -12,13 +12,6 @@ services:
     volumes:
       - ./docker/postgres/data:/var/lib/postgres/data
     container_name: musa.postgres
-  redis:
-    image: redis:alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - ./docker/redis/data:/data
-    container_name: musa.redis
   rust:
     build:
       context: .
@@ -28,9 +21,7 @@ services:
       - ./:/musa_diesel
     depends_on:
       - postgres 
-      - redis
     links:
       - postgres
-      - redis
     container_name: musa.rust
 
