@@ -1,4 +1,3 @@
-use actix_session::Session;
 use actix_web::{web::Query, HttpResponse, Result};
 use serde::Deserialize;
 use spotify_api::{
@@ -40,7 +39,7 @@ pub async fn get_login_url() -> String {
     oauth.generate_auth_url().unwrap()
 }
 
-pub async fn login(Query(code): Query<Callback>, session: Session) -> Result<HttpResponse> {
+pub async fn login(Query(code): Query<Callback>) -> Result<HttpResponse> {
     let tokens = request_tokens(&code.code).unwrap();
 
     let access_token = &tokens.access_token;
@@ -60,9 +59,6 @@ pub async fn login(Query(code): Query<Callback>, session: Session) -> Result<Htt
 
         return Ok(HttpResponse::Created().finish());
     }
-
-    session.set("user_id", &user_id)?;
-    session.renew();
 
     Ok(HttpResponse::Ok().finish())
 }

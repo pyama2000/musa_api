@@ -3,7 +3,6 @@ extern crate diesel;
 
 use std::env;
 
-use actix_redis::RedisSession;
 use actix_web::{
     middleware::{DefaultHeaders, Logger},
     web::{get, post, resource},
@@ -24,11 +23,8 @@ async fn main() -> std::io::Result<()> {
     env::set_var("RUST_LOG", "actix_web=info,actix_redis=info");
     env_logger::init();
 
-    let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "redis:6379".to_owned());
-
     HttpServer::new(move || {
         App::new()
-            .wrap(RedisSession::new(&redis_url, &[0; 32]))
             .wrap(DefaultHeaders::new().header("Access-Control-Allow-Origin", "*"))
             .wrap(Logger::default())
             .service(resource("/auth").route(get().to(login::get_login_url)))
