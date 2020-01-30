@@ -11,8 +11,10 @@ use actix_web::{
 };
 use dotenv::dotenv;
 
+use crate::handler::*;
+
 mod database;
-mod login;
+mod handler;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
