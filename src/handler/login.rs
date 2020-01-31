@@ -57,8 +57,8 @@ pub async fn login(Query(code): Query<Callback>) -> Result<HttpResponse> {
         let token = database::token::create_token(&connection, access_token, refresh_token);
         let _ = database::credential::create_credential(&connection, &user_id, token.id);
 
-        return Ok(HttpResponse::Created().finish());
+        return Ok(HttpResponse::Created().json(user_id));
     }
 
-    Ok(HttpResponse::Ok().finish())
+    Ok(HttpResponse::Ok().json(user_id))
 }
