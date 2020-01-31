@@ -58,7 +58,7 @@ pub async fn login(Query(code): Query<Callback>, session: Session) -> Result<Htt
         let token = database::token::create_token(&connection, access_token, refresh_token);
         let _ = database::credential::create_credential(&connection, &user_id, token.id);
 
-        return Ok(HttpResponse::Created().finish())
+        return Ok(HttpResponse::Created().finish());
     }
 
     session.set("user_id", &user_id)?;
