@@ -1,3 +1,9 @@
+CREATE TABLE callbacks (
+  id SERIAL PRIMARY KEY,
+  code VARCHAR(511) NOT NULL,
+  state VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE tokens (
   id SERIAL PRIMARY KEY,
   access_token VARCHAR(300) NOT NULL,

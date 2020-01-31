@@ -1,4 +1,12 @@
 table! {
+    callbacks (id) {
+        id -> Int4,
+        code -> Varchar,
+        state -> Varchar,
+    }
+}
+
+table! {
     credentials (id) {
         id -> Int4,
         user_id -> Varchar,
@@ -23,4 +31,4 @@ table! {
 
 joinable!(credentials -> tokens (token_id));
 
-allow_tables_to_appear_in_same_query!(credentials, tokens, users,);
+allow_tables_to_appear_in_same_query!(callbacks, credentials, tokens, users,);
