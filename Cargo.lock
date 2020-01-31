@@ -1323,7 +1323,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "musa_diesel"
+name = "musa_api"
 version = "0.1.0"
 dependencies = [
  "actix-redis 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
