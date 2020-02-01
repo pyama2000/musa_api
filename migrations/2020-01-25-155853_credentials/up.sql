@@ -1,6 +1,6 @@
 CREATE TABLE callbacks (
   id SERIAL PRIMARY KEY,
-  code VARCHAR(511) NOT NULL,
+  code TEXT NOT NULL,
   state VARCHAR(255) NOT NULL
 );
 

@@ -1,7 +1,7 @@
 table! {
     callbacks (id) {
         id -> Int4,
-        code -> Varchar,
+        code -> Text,
         state -> Varchar,
     }
 }
