@@ -6,6 +6,20 @@ pub trait Selectable {
 }
 
 #[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
+pub struct Callback {
+    pub id: i32,
+    pub code: String,
+    pub state: String,
+}
+
+#[derive(Clone, Debug, Default, Insertable)]
+#[table_name = "callbacks"]
+pub struct NewCallback {
+    pub code: String,
+    pub state: String,
+}
+
+#[derive(Clone, Debug, Default, Associations, Identifiable, Queryable)]
 pub struct Credential {
     pub id: i32,
     pub user_id: String,

@@ -1,3 +1,4 @@
+pub mod callback;
 pub mod credential;
 mod models;
 mod schema;
