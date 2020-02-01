@@ -1,0 +1,27 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: musa
+      LANG: ja_JP.utf8
+    ports: 
+      - 5432:5432
+    volumes:
+      - ./docker/postgres/data:/var/lib/postgres/data
+    container_name: musa.postgres
+  rust:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/musa_diesel
+    depends_on:
+      - postgres 
+    links:
+      - postgres
+    container_name: musa.rust
+
