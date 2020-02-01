@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(DefaultHeaders::new().header("Access-Control-Allow-Origin", "*"))
             .wrap(Logger::default())
             .service(resource("/auth").route(get().to(login::get_login_url)))
+            .service(resource("/callback").route(post().to(login::callback)))
             .service(resource("/login").route(post().to(login::login)))
     })
     .bind("127.0.0.1:8000")?
