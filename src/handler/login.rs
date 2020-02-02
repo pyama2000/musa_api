@@ -86,6 +86,18 @@ pub async fn login(Query(state): Query<State>) -> Result<HttpResponse> {
         let _ = database::credential::create_credential(&connection, &user_id, token.id);
 
         return Ok(HttpResponse::Created().json(user_id));
+    } else {
+        let credential = database::credential::find_credential_by_user_id(&connection, &user_id)
+            .unwrap()
+            .unwrap();
+        let token = database::token::update_token(
+                &connection,
+                credential.token_id,
+                &access_token,
+                &refresh_token,
+            )
+            .unwrap();
+        let _ = database::credential::update_token_id(&connection, credential.id, token.id);
     }
 
     Ok(HttpResponse::Ok().json(user_id))
