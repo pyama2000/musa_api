@@ -48,6 +48,14 @@ pub struct Token {
     pub refresh_token: String,
 }
 
+impl Selectable for Token {
+    type Columns = (tokens::id, tokens::access_token, tokens::access_token);
+
+    fn columns() -> Self::Columns {
+        (tokens::id, tokens::access_token, tokens::access_token)
+    }
+}
+
 #[derive(Clone, Debug, Default, Insertable)]
 #[table_name = "tokens"]
 pub struct NewToken {
