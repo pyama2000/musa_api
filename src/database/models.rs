@@ -26,6 +26,14 @@ pub struct Credential {
     pub token_id: i32,
 }
 
+impl Selectable for Credential {
+    type Columns = (credentials::id, credentials::user_id, credentials::token_id);
+
+    fn columns() -> Self::Columns {
+        (credentials::id, credentials::user_id, credentials::token_id)
+    }
+}
+
 #[derive(Clone, Debug, Default, Insertable)]
 #[table_name = "credentials"]
 pub struct NewCredential {
