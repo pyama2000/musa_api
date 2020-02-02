@@ -1,5 +1,5 @@
 use actix_web::{web::Query, HttpResponse, Result};
-use serde_json::json;
+use serde_json::{json, value::Value};
 use spotify_api::playlist::PlaylistClient;
 
 use crate::{database, handler::User};
@@ -16,9 +16,24 @@ pub async fn get_playlists(Query(user): Query<User>) -> Result<HttpResponse> {
         .unwrap();
 
     let mut client = PlaylistClient::new(&token.access_token, &token.refresh_token);
-    let playlists = client
+    let playlists: Vec<Value> = client
         .get_current_user_playlists(None, None)
-        .get_all_items();
+        .get_all_items()
+        .into_iter()
+        .map(|playlist| {
+            let image_url = match playlist.images.first() {
+                Some(image) => &image.url,
+                None => "",
+            };
+
+            json!({
+                "description": playlist.description.unwrap(),
+                "id": playlist.id,
+                "image_url": image_url,
+                "name": playlist.name,
+            })
+        })
+        .collect();
 
     let json = json!({
         "playlists": playlists,
