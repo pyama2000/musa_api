@@ -26,6 +26,14 @@ pub struct Credential {
     pub token_id: i32,
 }
 
+impl Selectable for Credential {
+    type Columns = (credentials::id, credentials::user_id, credentials::token_id);
+
+    fn columns() -> Self::Columns {
+        (credentials::id, credentials::user_id, credentials::token_id)
+    }
+}
+
 #[derive(Clone, Debug, Default, Insertable)]
 #[table_name = "credentials"]
 pub struct NewCredential {
@@ -38,6 +46,14 @@ pub struct Token {
     pub id: i32,
     pub access_token: String,
     pub refresh_token: String,
+}
+
+impl Selectable for Token {
+    type Columns = (tokens::id, tokens::access_token, tokens::access_token);
+
+    fn columns() -> Self::Columns {
+        (tokens::id, tokens::access_token, tokens::access_token)
+    }
 }
 
 #[derive(Clone, Debug, Default, Insertable)]
