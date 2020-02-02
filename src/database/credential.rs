@@ -17,6 +17,19 @@ pub fn create_credential(connection: &PgConnection, user_id: &str, token_id: i32
         .expect("Error saving credential")
 }
 
+pub fn find_token_id_by_user_id(
+    connection: &PgConnection,
+    spotify_user_id: &str,
+) -> Result<Option<i32>, diesel::result::Error> {
+    use schema::credentials::dsl::{credentials, token_id, user_id};
+
+    credentials
+        .select(token_id)
+        .filter(user_id.eq(spotify_user_id.to_owned()))
+        .get_result(connection)
+        .optional()
+}
+
 pub fn find_credential_by_user_id(
     connection: &PgConnection,
     spotify_user_id: &str,

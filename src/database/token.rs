@@ -17,6 +17,19 @@ pub fn create_token(connection: &PgConnection, access_token: &str, refresh_token
         .expect("Error saving token")
 }
 
+pub fn find_token(
+    connection: &PgConnection,
+    id: i32,
+) -> Result<Option<Token>, diesel::result::Error> {
+    use schema::tokens::dsl::tokens;
+
+    tokens
+        .find(id)
+        .select(Token::columns())
+        .get_result(connection)
+        .optional()
+}
+
 pub fn update_token(
     connection: &PgConnection,
     token_id: i32,
