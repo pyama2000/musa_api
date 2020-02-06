@@ -1,5 +1,5 @@
 use actix_web::{web::Query, HttpResponse, Result};
-use serde_json::{json, value::Value};
+use serde_json::json;
 use spotify_api::playlist::PlaylistClient;
 
 use crate::{database, handler::User};
@@ -16,27 +16,36 @@ pub async fn get_playlists(Query(user): Query<User>) -> Result<HttpResponse> {
         .unwrap();
 
     let mut client = PlaylistClient::new(&token.access_token, &token.refresh_token);
-    let playlists: Vec<Value> = client
-        .get_current_user_playlists(None, None)
-        .get_all_items()
-        .into_iter()
-        .map(|playlist| {
-            let image_url = match playlist.images.first() {
-                Some(image) => &image.url,
-                None => "",
-            };
 
-            json!({
-                "description": playlist.description.unwrap(),
-                "id": playlist.id,
-                "image_url": image_url,
-                "name": playlist.name,
-            })
-        })
-        .collect();
+    let mut user_playlists = Vec::new();
+    let mut followed_playlists = Vec::new();
+
+    let playlists = client
+        .get_current_user_playlists(None, None)
+        .get_all_items();
+
+    for playlist in playlists {
+        let image_url = match playlist.images.first() {
+            Some(image) => &image.url,
+            None => "",
+        };
+
+        let playlist_json = json!({
+            "id": playlist.id,
+            "image_url": image_url,
+            "name": playlist.name,
+        });
+
+        if playlist.owner.id == user_id {
+            user_playlists.push(playlist_json);
+        } else {
+            followed_playlists.push(playlist_json);
+        }
+    }
 
     let json = json!({
-        "playlists": playlists,
+        "user_playlists": user_playlists,
+        "followed_playlists": followed_playlists,
     });
 
     Ok(HttpResponse::Ok().json(json))
