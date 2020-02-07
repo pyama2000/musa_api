@@ -25,7 +25,7 @@ pub async fn get_playlists(Query(user): Query<User>) -> Result<HttpResponse> {
         .get_all_items();
 
     for playlist in playlists {
-        let image_url = match playlist.images.first() {
+        let image_url = match playlist.images.last() {
             Some(image) => &image.url,
             None => "",
         };
