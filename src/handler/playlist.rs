@@ -76,3 +76,26 @@ pub async fn get_playlist(Query(query): Query<Playlist>) -> Result<HttpResponse>
 
     Ok(HttpResponse::Ok().json(json))
 }
+
+pub async fn get_tracks(Query(query): Query<Playlist>) -> Result<HttpResponse> {
+    let user_id = query.user.user_id;
+
+    let connection = database::establish_connection();
+    let token_id = database::credential::find_token_id_by_user_id(&connection, &user_id)
+        .unwrap()
+        .unwrap();
+    let token = database::token::find_token(&connection, token_id)
+        .unwrap()
+        .unwrap();
+
+    let mut client = PlaylistClient::new(&token.access_token, &token.refresh_token);
+    let tracks = client
+        .get_tracks(&query.playlist_id, None, None, None)
+        .get_all_items();
+
+    let json = json!({
+        "tracks": tracks,
+    });
+
+    Ok(HttpResponse::Ok().json(json))
+}
