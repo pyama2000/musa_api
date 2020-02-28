@@ -31,7 +31,7 @@ pub async fn get_playlists(Query(user): Query<User>) -> Result<HttpResponse> {
     let playlists = client.get_current_user_playlists(None, None).get_items();
 
     for playlist in playlists {
-        let image_url = match playlist.images.last() {
+        let image_url = match playlist.images.first() {
             Some(image) => &image.url,
             None => "",
         };
