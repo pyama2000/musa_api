@@ -91,12 +91,12 @@ pub async fn login(Query(state): Query<State>) -> Result<HttpResponse> {
             .unwrap()
             .unwrap();
         let token = database::token::update_token(
-                &connection,
-                credential.token_id,
-                &access_token,
-                &refresh_token,
-            )
-            .unwrap();
+            &connection,
+            credential.token_id,
+            &access_token,
+            &refresh_token,
+        )
+        .unwrap();
         let _ = database::credential::update_token_id(&connection, credential.id, token.id);
     }
 

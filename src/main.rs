@@ -31,6 +31,8 @@ async fn main() -> std::io::Result<()> {
             .service(resource("/callback").route(post().to(login::callback)))
             .service(resource("/login").route(post().to(login::login)))
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
+            .service(resource("/playlist").route(get().to(playlist::get_playlist)))
+            .service(resource("/tracks").route(get().to(playlist::get_tracks)))
     })
     .bind("127.0.0.1:8000")?
     .run()
