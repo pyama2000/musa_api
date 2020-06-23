@@ -1,18 +1,17 @@
-FROM rust:latest
+FROM rust:1 as builder
+WORKDIR /usr/src/musa_api
+COPY Cargo.toml Cargo.toml
+RUN mkdir src && ¥
+    echo "fn main() {println!(¥"if you see this, the build broke¥")}" > src/main.rs
+RUN cargo build --release
+RUN rm -rf target/release/deps/musa_api*
+COPY . .
+RUN cargo build --release
+RUN cargo install --path .
 
-WORKDIR /musa_diesel
-
-ENV USER pyama2000
-
+FROM debian:buster-slim
 EXPOSE 8000 8000
+RUN apt-get update
+COPY --from=builder /usr/local/cargo/bin/musa_api /usr/local/bin/musa_api
 
-RUN cargo install diesel_cli --no-default-features --features postgres && \
-    cargo install cargo-watch && \
-    rustup component add clippy && \
-    cargo init
-
-COPY Cargo.* /musa_diesel/
-
-RUN cargo run
-
-CMD ["cargo", "watch", "-x", "clippy", "-x", "test", "-x", "run"]
+CMD ["musa_api"]
