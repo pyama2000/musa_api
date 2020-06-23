@@ -1,0 +1,8 @@
+FROM rust:1.44
+WORKDIR /musa_api
+RUN rustup component add clippy
+RUN cargo install cargo-watch
+RUN cargo install diesel_cli --no-default-features --features postgres
+RUN USER=pyama2000 cargo init
+COPY Cargo.toml Cargo.toml
+RUN cargo run && cargo clippy
