@@ -12,17 +12,16 @@ use actix_web::{
 };
 use dotenv::dotenv;
 
-use crate::handler::*;
-
 mod database;
 mod handler;
+use crate::handler::*;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    env::set_var("RUST_LOG", "actix_web=info,actix_redis=info");
+
     dotenv().ok();
     better_panic::install();
-
-    env::set_var("RUST_LOG", "actix_web=info,actix_redis=info");
     env_logger::init();
 
     let redis_url = env::var("REDIS_URL").unwrap_or("0.0.0.0:6379".to_string());
