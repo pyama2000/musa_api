@@ -45,11 +45,18 @@ pub async fn get_login_url() -> Result<impl Responder, Error> {
     Ok(HttpResponse::Ok().json(json))
 }
 
-pub async fn login(Json(request): Json<GetTokenRequest>, session: Session) -> Result<impl Responder, Error> {
+pub async fn login(
+    Json(request): Json<GetTokenRequest>,
+    session: Session,
+) -> Result<impl Responder, Error> {
+    if session.get::<String>("access_token")?.is_some() {
+        return Ok(HttpResponse::NoContent().finish());
+    }
+
     let tokens = spotify_api::authentication::request_tokens(&request.code).unwrap();
 
     session.set("access_token", &tokens.access_token)?;
-    session.set("access_token", &tokens.refresh_token)?;
+    session.set("refresh_token", &tokens.refresh_token)?;
 
     Ok(HttpResponse::Ok().finish())
 }
