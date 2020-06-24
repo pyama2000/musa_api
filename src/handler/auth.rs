@@ -52,7 +52,7 @@ pub async fn login(
     Json(request): Json<GetTokenRequest>,
     session: Session,
 ) -> Result<impl Responder, Error> {
-    if session.get::<String>("access_token")?.is_some() {
+    if session.get::<String>("user_id")?.is_some() {
         return Ok(HttpResponse::NoContent().finish());
     }
 
