@@ -2,7 +2,10 @@ use actix_session::Session;
 use actix_web::{web::Json, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
-use spotify_api::authentication::{Scope, SpotifyOAuth};
+use spotify_api::{
+    authentication::{Scope, SpotifyOAuth, Token},
+    user::UserClient,
+};
 
 #[derive(Debug, Deserialize)]
 pub struct GetTokenRequest {
@@ -53,10 +56,19 @@ pub async fn login(
         return Ok(HttpResponse::NoContent().finish());
     }
 
-    let tokens = spotify_api::authentication::request_tokens(&request.code).unwrap();
+    let Token {
+        access_token,
+        refresh_token,
+        ..
+    } = spotify_api::authentication::request_tokens(&request.code).unwrap();
 
-    session.set("access_token", &tokens.access_token)?;
-    session.set("refresh_token", &tokens.refresh_token)?;
+    let user_id = UserClient::new(&access_token, &refresh_token.unwrap())
+        .get_current_user()
+        .id;
+
+    session.set("user_id", &user_id)?;
+    session.set("access_token", &access_token)?;
+    session.set("refresh_token", &refresh_token.unwrap())?;
 
     Ok(HttpResponse::Ok().finish())
 }
