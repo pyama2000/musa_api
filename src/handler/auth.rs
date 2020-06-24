@@ -1,5 +1,5 @@
 use actix_session::Session;
-use actix_web::{web::Json, HttpResponse, Result};
+use actix_web::{web::Json, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
 use spotify_api::authentication::{Scope, SpotifyOAuth};
@@ -9,7 +9,7 @@ pub struct GetTokenRequest {
     code: String,
 }
 
-pub async fn get_login_url() -> Result<HttpResponse> {
+pub async fn get_login_url() -> Result<impl Responder, Error> {
     let scopes = vec![
         Scope::UserReadPrivate,
         Scope::UserReadBirthdate,
@@ -45,11 +45,11 @@ pub async fn get_login_url() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(json))
 }
 
-pub async fn login(Json(request): Json<GetTokenRequest>, session: Session) -> Result<HttpResponse> {
+pub async fn login(Json(request): Json<GetTokenRequest>, session: Session) -> Result<impl Responder, Error> {
     let tokens = spotify_api::authentication::request_tokens(&request.code).unwrap();
 
-    session.set("access_token", &tokens.access_token).unwrap();
-    session.set("access_token", &tokens.refresh_token).unwrap();
+    session.set("access_token", &tokens.access_token)?;
+    session.set("access_token", &tokens.refresh_token)?;
 
     Ok(HttpResponse::Ok().finish())
 }
