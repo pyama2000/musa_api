@@ -62,13 +62,15 @@ pub async fn login(
         ..
     } = spotify_api::authentication::request_tokens(&request.code).unwrap();
 
-    let user_id = UserClient::new(&access_token, &refresh_token.unwrap())
+    let refresh_token = refresh_token.unwrap();
+
+    let user_id = UserClient::new(&access_token, &refresh_token)
         .get_current_user()
         .id;
 
     session.set("user_id", &user_id)?;
     session.set("access_token", &access_token)?;
-    session.set("refresh_token", &refresh_token.unwrap())?;
+    session.set("refresh_token", &refresh_token)?;
 
     Ok(HttpResponse::Ok().finish())
 }
