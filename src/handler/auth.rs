@@ -12,7 +12,7 @@ pub struct GetTokenRequest {
     code: String,
 }
 
-pub async fn get_login_url() -> Result<impl Responder, Error> {
+pub async fn get_login_url(session: Session) -> Result<impl Responder, Error> {
     let scopes = vec![
         Scope::UserReadPrivate,
         Scope::UserReadBirthdate,
@@ -45,6 +45,8 @@ pub async fn get_login_url() -> Result<impl Responder, Error> {
         "state": state,
     });
 
+    session.renew();
+
     Ok(HttpResponse::Ok().json(json))
 }
 
@@ -61,7 +63,6 @@ pub async fn login(
         refresh_token,
         ..
     } = spotify_api::authentication::request_tokens(&request.code).unwrap();
-
     let refresh_token = refresh_token.unwrap();
 
     let user_id = UserClient::new(&access_token, &refresh_token)
