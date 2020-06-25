@@ -7,7 +7,7 @@ use actix_redis::RedisSession;
 use actix_web::{
     http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS,
     middleware::{DefaultHeaders, Logger},
-    web::{get, post, resource},
+    web::{get, post, resource, scope},
     App, HttpServer,
 };
 use dotenv::dotenv;
@@ -32,10 +32,12 @@ async fn main() -> std::io::Result<()> {
             .wrap(RedisSession::new(&redis_url, &[0; 32]))
             .wrap(actix_cors::Cors::default())
             .wrap(DefaultHeaders::new().header(ACCESS_CONTROL_ALLOW_CREDENTIALS, "true"))
-            .service(resource("/auth")
-                     .route(get().to(auth::get_login_url))
-                     .route(post().to(auth::login))
+            .service(
+                resource("/auth")
+                    .route(get().to(auth::get_login_url))
+                    .route(post().to(auth::login)),
             )
+            .service(scope("/player").route("/current", get().to(player::get_current_playing)))
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
             .service(resource("/playlist").route(get().to(playlist::get_playlist)))
             .service(resource("/tracks").route(get().to(playlist::get_tracks)))

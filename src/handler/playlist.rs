@@ -1,5 +1,5 @@
 use actix_session::Session;
-use actix_web::{web::Query, HttpResponse, Responder, Error};
+use actix_web::{web::Query, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
 use spotify_api::playlist::PlaylistClient;
