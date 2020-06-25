@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     better_panic::install();
     env_logger::init();
 
-    let redis_url = env::var("REDIS_URL").unwrap_or("0.0.0.0:6379".to_string());
+    let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "0.0.0.0:6379".to_string());
 
     HttpServer::new(move || {
         App::new()
