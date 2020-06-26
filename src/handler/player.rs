@@ -32,3 +32,93 @@ pub async fn get_current_playing(session: Session) -> Result<impl Responder, Err
 
     Ok(HttpResponse::NoContent().finish())
 }
+
+pub async fn pause(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = PlayerClient::new(&access_token, &refresh_token);
+    client.pause(None);
+
+    Ok(HttpResponse::NoContent().finish())
+}
+
+pub async fn resume(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = PlayerClient::new(&access_token, &refresh_token);
+    client.play(None, None);
+
+    Ok(HttpResponse::NoContent().finish())
+}
+
+pub async fn next(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = PlayerClient::new(&access_token, &refresh_token);
+    client.skip_next(None);
+
+    if let Some(response) = client.get_currently_playing_track(None) {
+        if response.currently_playing_type.eq("track") {
+            let track: Track = serde_json::from_value(response.item.unwrap()).unwrap();
+
+            let response = json!({
+                "is_playing": response.is_playing,
+                "track": {
+                    "id": track.id,
+                    "image": track.album.unwrap().images.first().unwrap().url,
+                    "name": track.name,
+                }
+            });
+
+            return Ok(HttpResponse::Ok().json(response));
+        }
+    }
+
+    Ok(HttpResponse::NoContent().finish())
+}
+
+pub async fn previous(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = PlayerClient::new(&access_token, &refresh_token);
+    client.skip_previous(None);
+
+    if let Some(response) = client.get_currently_playing_track(None) {
+        if response.currently_playing_type.eq("track") {
+            let track: Track = serde_json::from_value(response.item.unwrap()).unwrap();
+
+            let response = json!({
+                "is_playing": response.is_playing,
+                "track": {
+                    "id": track.id,
+                    "image": track.album.unwrap().images.first().unwrap().url,
+                    "name": track.name,
+                }
+            });
+
+            return Ok(HttpResponse::Ok().json(response));
+        }
+    }
+
+    Ok(HttpResponse::NoContent().finish())
+}
