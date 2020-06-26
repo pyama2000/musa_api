@@ -27,7 +27,7 @@ pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
     let mut user_playlists = Vec::new();
     let mut followed_playlists = Vec::new();
 
-    let playlists = client.get_current_user_playlists(None, None).get_items();
+    let playlists = client.get_current_user_playlists(None, None).get_all_items();
 
     for playlist in playlists {
         let image_url = match playlist.images.first() {
