@@ -1,5 +1,5 @@
-#[macro_use]
-extern crate diesel;
+// #[macro_use]
+// extern crate diesel;
 
 use std::env;
 
@@ -12,7 +12,7 @@ use actix_web::{
 };
 use dotenv::dotenv;
 
-mod database;
+// mod database;
 mod handler;
 use crate::handler::*;
 
@@ -46,8 +46,9 @@ async fn main() -> std::io::Result<()> {
                     .route("/previous", post().to(player::previous)),
             )
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
-            .service(resource("/playlist").route(get().to(playlist::get_playlist)))
-            .service(resource("/tracks").route(get().to(playlist::get_tracks)))
+            .service(resource("/featured").route(get().to(playlist::get_featured_playlists)))
+            // .service(resource("/playlist").route(get().to(playlist::get_playlist)))
+            // .service(resource("/tracks").route(get().to(playlist::get_tracks)))
     })
     .bind("0.0.0.0:8000")?
     .run()
