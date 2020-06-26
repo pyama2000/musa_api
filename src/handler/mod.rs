@@ -1,6 +1,7 @@
 use serde::Deserialize;
 
-pub mod login;
+pub mod auth;
+pub mod player;
 pub mod playlist;
 
 #[derive(Deserialize)]

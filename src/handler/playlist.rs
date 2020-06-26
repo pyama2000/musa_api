@@ -1,4 +1,5 @@
-use actix_web::{web::Query, HttpResponse, Result};
+use actix_session::Session;
+use actix_web::{web::Query, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
 use spotify_api::playlist::PlaylistClient;
@@ -12,18 +13,16 @@ pub struct Playlist {
     user: User,
 }
 
-pub async fn get_playlists(Query(user): Query<User>) -> Result<HttpResponse> {
-    let user_id = user.user_id;
+pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
 
-    let connection = database::establish_connection();
-    let token_id = database::credential::find_token_id_by_user_id(&connection, &user_id)
-        .unwrap()
-        .unwrap();
-    let token = database::token::find_token(&connection, token_id)
-        .unwrap()
-        .unwrap();
+    let user_id = session.get::<String>("user_id")?.unwrap();
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
 
-    let mut client = PlaylistClient::new(&token.access_token, &token.refresh_token);
+    let mut client = PlaylistClient::new(&access_token, &refresh_token);
 
     let mut user_playlists = Vec::new();
     let mut followed_playlists = Vec::new();
@@ -57,7 +56,7 @@ pub async fn get_playlists(Query(user): Query<User>) -> Result<HttpResponse> {
     Ok(HttpResponse::Ok().json(json))
 }
 
-pub async fn get_playlist(Query(query): Query<Playlist>) -> Result<HttpResponse> {
+pub async fn get_playlist(Query(query): Query<Playlist>) -> Result<impl Responder, Error> {
     let user_id = query.user.user_id;
 
     let connection = database::establish_connection();
@@ -77,7 +76,7 @@ pub async fn get_playlist(Query(query): Query<Playlist>) -> Result<HttpResponse>
     Ok(HttpResponse::Ok().json(json))
 }
 
-pub async fn get_tracks(Query(query): Query<Playlist>) -> Result<HttpResponse> {
+pub async fn get_tracks(Query(query): Query<Playlist>) -> Result<impl Responder, Error> {
     let user_id = query.user.user_id;
 
     let connection = database::establish_connection();
