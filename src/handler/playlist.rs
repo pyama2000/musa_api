@@ -2,16 +2,11 @@ use actix_session::Session;
 use actix_web::{web::Query, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
-use spotify_api::{browse::BrowseClient, object::Playlist, playlist::PlaylistClient};
-
-// use crate::handler::User;
-
-// #[derive(Deserialize)]
-// pub struct Playlist {
-//     playlist_id: String,
-//     #[serde(flatten)]
-//     user: User,
-// }
+use spotify_api::{
+    browse::BrowseClient,
+    object::{Playlist, Track},
+    playlist::PlaylistClient,
+};
 
 #[derive(Debug, Deserialize)]
 pub struct GetPlaylistRequest {
@@ -142,26 +137,65 @@ pub async fn get_playlist(
 
     Ok(HttpResponse::Ok().json(response))
 }
-//
-// pub async fn get_tracks(Query(query): Query<Playlist>) -> Result<impl Responder, Error> {
-//     let user_id = query.user.user_id;
-//
-//     let connection = database::establish_connection();
-//     let token_id = database::credential::find_token_id_by_user_id(&connection, &user_id)
-//         .unwrap()
-//         .unwrap();
-//     let token = database::token::find_token(&connection, token_id)
-//         .unwrap()
-//         .unwrap();
-//
-//     let mut client = PlaylistClient::new(&token.access_token, &token.refresh_token);
-//     let tracks = client
-//         .get_tracks(&query.playlist_id, None, None, None)
-//         .get_all_items();
-//
-//     let json = json!({
-//         "tracks": tracks,
-//     });
-//
-//     Ok(HttpResponse::Ok().json(json))
-// }
+
+#[derive(Debug, Deserialize)]
+pub struct GetTracksRequest {
+    playlist_id: String,
+}
+
+pub async fn get_tracks(
+    Query(request): Query<GetTracksRequest>,
+    session: Session,
+) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = PlaylistClient::new(&access_token, &refresh_token);
+    let tracks = client
+        .get_tracks(&request.playlist_id, None, None, None)
+        .get_items();
+
+    let mut track_jsons = Vec::new();
+    for track in tracks {
+        let Track {
+            album,
+            artists,
+            id,
+            name,
+            uri,
+            ..
+        } = track.track;
+        let album = album.unwrap();
+        let artist = artists.first().unwrap();
+
+        let artist_json = json!({
+            "id": artist.id,
+            "name": artist.name,
+            "uri": artist.uri,
+        });
+
+        let track = json!({
+            "album": {
+                "id": album.id,
+                "image": album.images.first(),
+                "name": album.name,
+            },
+            "artist": artist_json,
+            "id": id,
+            "name": name,
+            "uri": uri,
+        });
+
+        track_jsons.push(track);
+    }
+
+    let response = json!({
+        "tracks": track_jsons,
+    });
+
+    Ok(HttpResponse::Ok().json(response))
+}
