@@ -42,7 +42,8 @@ async fn main() -> std::io::Result<()> {
                     .route("/current", get().to(player::get_current_playing))
                     .route("/pause", put().to(player::pause))
                     .route("/resume", put().to(player::resume))
-                    .route("/next", post().to(player::next)),
+                    .route("/next", post().to(player::next))
+                    .route("/previous", post().to(player::previous)),
             )
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
             .service(resource("/playlist").route(get().to(playlist::get_playlist)))
