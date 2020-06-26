@@ -40,7 +40,8 @@ async fn main() -> std::io::Result<()> {
             .service(
                 scope("/player")
                     .route("/current", get().to(player::get_current_playing))
-                    .route("/pause", put().to(player::pause)),
+                    .route("/pause", put().to(player::pause))
+                    .route("/resume", put().to(player::resume)),
             )
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
             .service(resource("/playlist").route(get().to(playlist::get_playlist)))
