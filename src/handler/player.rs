@@ -32,3 +32,17 @@ pub async fn get_current_playing(session: Session) -> Result<impl Responder, Err
 
     Ok(HttpResponse::NoContent().finish())
 }
+
+pub async fn pause(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = PlayerClient::new(&access_token, &refresh_token);
+    client.pause(None);
+
+    Ok(HttpResponse::NoContent().finish())
+}
