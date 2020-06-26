@@ -46,6 +46,7 @@ async fn main() -> std::io::Result<()> {
                     .route("/previous", post().to(player::previous)),
             )
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
+            .service(resource("/featured").route(get().to(playlist::get_featured_playlists)))
             // .service(resource("/playlist").route(get().to(playlist::get_playlist)))
             // .service(resource("/tracks").route(get().to(playlist::get_tracks)))
     })

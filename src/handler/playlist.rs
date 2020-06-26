@@ -2,7 +2,7 @@ use actix_session::Session;
 use actix_web::{Error, HttpResponse, Responder};
 // use serde::Deserialize;
 use serde_json::json;
-use spotify_api::playlist::PlaylistClient;
+use spotify_api::{browse::BrowseClient, playlist::PlaylistClient};
 
 // use crate::handler::User;
 
@@ -54,6 +54,40 @@ pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
     });
 
     Ok(HttpResponse::Ok().json(json))
+}
+
+pub async fn get_featured_playlists(session: Session) -> Result<impl Responder, Error> {
+    if session.get::<String>("user_id")?.is_none() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
+
+    let access_token = session.get::<String>("access_token")?.unwrap();
+    let refresh_token = session.get::<String>("refresh_token")?.unwrap();
+
+    let mut client = BrowseClient::new(&access_token, &refresh_token);
+    let playlists = client.get_featured_playlists(None, None, Some(10), None).1.get_items();
+
+    let mut jsons = Vec::new();
+    for playlist in playlists {
+        let image_url = match playlist.images.first() {
+            Some(image) => &image.url,
+            None => "",
+        };
+
+        let json = json!({
+            "id": playlist.id,
+            "image_url": image_url,
+            "name": playlist.name,
+        });
+
+        jsons.push(json);
+    }
+
+    let response = json!({
+        "playlists": jsons,
+    });
+
+    Ok(HttpResponse::Ok().json(response))
 }
 
 // pub async fn get_playlist(Query(query): Query<Playlist>) -> Result<impl Responder, Error> {
