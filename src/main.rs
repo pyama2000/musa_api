@@ -47,8 +47,11 @@ async fn main() -> std::io::Result<()> {
             )
             .service(resource("/playlists").route(get().to(playlist::get_playlists)))
             .service(resource("/featured").route(get().to(playlist::get_featured_playlists)))
-            .service(resource("/playlist").route(get().to(playlist::get_playlist)))
-            .service(resource("/playlist/tracks").route(get().to(playlist::get_tracks)))
+            .service(
+                scope("/playlist")
+                    .route("", get().to(playlist::get_playlist))
+                    .route("/tracks", get().to(playlist::get_tracks))
+            )
     })
     .bind("0.0.0.0:8000")?
     .run()
