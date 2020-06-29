@@ -52,6 +52,7 @@ async fn main() -> std::io::Result<()> {
                     .route("", get().to(playlist::get_playlist))
                     .route("/tracks", get().to(playlist::get_tracks))
             )
+            .service(resource("/search").route(get().to(search::search)))
     })
     .bind("0.0.0.0:8000")?
     .run()
