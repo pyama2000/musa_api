@@ -26,7 +26,6 @@ pub async fn search(
     let queries: Vec<String> = request
         .query
         .split_whitespace()
-        .into_iter()
         .map(|s| s.to_string())
         .collect();
 
@@ -60,7 +59,7 @@ pub async fn search(
     // }
 
     let mut album_query = SearchQuery::new("album");
-    album_query.query = queries.clone();
+    album_query.query = queries;
     let albums: Vec<Album> = client.search(album_query, None, Some(5), None).get_items();
     let mut album_jsons = Vec::new();
     for album in albums {
