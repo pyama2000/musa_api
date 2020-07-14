@@ -50,7 +50,7 @@ async fn main() -> std::io::Result<()> {
             .service(
                 scope("/playlist")
                     .route("", get().to(playlist::get_playlist))
-                    .route("/tracks", get().to(playlist::get_tracks))
+                    .route("/tracks", get().to(playlist::get_tracks)),
             )
             .service(resource("/search").route(get().to(search::search)))
     })
