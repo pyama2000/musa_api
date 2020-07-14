@@ -3,7 +3,7 @@ use actix_web::{web::Json, Error, HttpResponse, Responder};
 use serde::Deserialize;
 use serde_json::json;
 use spotify_api::{
-    authentication::{Scope, SpotifyOAuth, Token},
+    authentication::{RequestTokenResponse, Scope, SpotifyOAuth},
     user::UserClient,
 };
 
@@ -15,7 +15,6 @@ pub struct GetTokenRequest {
 pub async fn get_login_url(session: Session) -> Result<impl Responder, Error> {
     let scopes = vec![
         Scope::UserReadPrivate,
-        Scope::UserReadBirthdate,
         Scope::UserReadEmail,
         Scope::Streaming,
         Scope::AppRemoteControl,
@@ -38,11 +37,10 @@ pub async fn get_login_url(session: Session) -> Result<impl Responder, Error> {
     oauth.set_scopes(&scopes);
 
     let url = oauth.generate_auth_url().unwrap();
-    let state = oauth.get_state();
 
     let json = json!({
         "url": url,
-        "state": state,
+        "state": oauth.state,
     });
 
     session.renew();
@@ -58,15 +56,15 @@ pub async fn login(
         return Ok(HttpResponse::NoContent().finish());
     }
 
-    let Token {
+    let RequestTokenResponse {
         access_token,
         refresh_token,
-        ..
-    } = spotify_api::authentication::request_tokens(&request.code).unwrap();
-    let refresh_token = refresh_token.unwrap();
+    } = spotify_api::authentication::request_tokens(&request.code).await?;
 
     let user_id = UserClient::new(&access_token, &refresh_token)
         .get_current_user()
+        .await
+        .unwrap()
         .id;
 
     session.set("user_id", &user_id)?;
