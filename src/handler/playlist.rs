@@ -13,7 +13,15 @@ pub struct GetPlaylistRequest {
     playlist_id: String,
 }
 
-pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
+#[derive(Debug, Deserialize)]
+pub struct GetPlaylistsRequest {
+    limit: Option<u32>,
+}
+
+pub async fn get_playlists(
+    request: Query<GetPlaylistsRequest>,
+    session: Session,
+) -> Result<impl Responder, Error> {
     if session.get::<String>("user_id")?.is_none() {
         return Ok(HttpResponse::Unauthorized().finish());
     }
@@ -27,17 +35,21 @@ pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
     let mut user_playlists = Vec::new();
     let mut followed_playlists = Vec::new();
 
-    let request = spotify_api::playlist::GetPlaylistsRequest {
+    let get_playlists_request = spotify_api::playlist::GetPlaylistsRequest {
+        limit: request.limit,
         ..Default::default()
     };
 
-    let playlists = client
-        .get_playlists(request)
-        .await
-        .unwrap()
-        .get_all_items(&access_token, &refresh_token)
+    let paging_object = client
+        .get_playlists(get_playlists_request)
         .await
         .unwrap();
+
+    let playlists = if request.limit.is_some() {
+        paging_object.get_items()
+    } else {
+        paging_object.get_all_items(&access_token, &refresh_token).await.unwrap()
+    };
 
     for playlist in playlists {
         let image_url = match playlist.images.first() {
