@@ -4,8 +4,8 @@ use serde::Deserialize;
 use serde_json::json;
 use spotify_api::{
     browse::BrowseClient,
-    object::{Playlist, Track},
-    playlist::PlaylistClient,
+    playlist::{Playlist, PlaylistClient},
+    track::Track,
 };
 
 #[derive(Debug, Deserialize)]
@@ -13,7 +13,15 @@ pub struct GetPlaylistRequest {
     playlist_id: String,
 }
 
-pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
+#[derive(Debug, Deserialize)]
+pub struct GetPlaylistsRequest {
+    limit: Option<u32>,
+}
+
+pub async fn get_playlists(
+    request: Query<GetPlaylistsRequest>,
+    session: Session,
+) -> Result<impl Responder, Error> {
     if session.get::<String>("user_id")?.is_none() {
         return Ok(HttpResponse::Unauthorized().finish());
     }
@@ -27,9 +35,21 @@ pub async fn get_playlists(session: Session) -> Result<impl Responder, Error> {
     let mut user_playlists = Vec::new();
     let mut followed_playlists = Vec::new();
 
-    let playlists = client
-        .get_current_user_playlists(None, None)
-        .get_all_items();
+    let get_playlists_request = spotify_api::playlist::GetPlaylistsRequest {
+        limit: request.limit,
+        ..Default::default()
+    };
+
+    let paging_object = client
+        .get_playlists(get_playlists_request)
+        .await
+        .unwrap();
+
+    let playlists = if request.limit.is_some() {
+        paging_object.get_items()
+    } else {
+        paging_object.get_all_items(&access_token, &refresh_token).await.unwrap()
+    };
 
     for playlist in playlists {
         let image_url = match playlist.images.first() {
@@ -67,9 +87,17 @@ pub async fn get_featured_playlists(session: Session) -> Result<impl Responder, 
     let refresh_token = session.get::<String>("refresh_token")?.unwrap();
 
     let mut client = BrowseClient::new(&access_token, &refresh_token);
+
+    let request = spotify_api::browse::GetFeaturedPlaylistRequest {
+        limit: Some(10),
+        ..Default::default()
+    };
+
     let playlists = client
-        .get_featured_playlists(None, None, Some(10), None)
-        .1
+        .get_featured_playlists(request)
+        .await
+        .unwrap()
+        .playlists
         .get_items();
 
     let mut jsons = Vec::new();
@@ -108,6 +136,11 @@ pub async fn get_playlist(
 
     let mut client = PlaylistClient::new(&access_token, &refresh_token);
 
+    let request = spotify_api::playlist::GetPlaylistRequest {
+        playlist_id: request.playlist_id,
+        ..Default::default()
+    };
+
     let Playlist {
         description,
         followers,
@@ -117,12 +150,12 @@ pub async fn get_playlist(
         owner,
         uri,
         ..
-    } = client.get_playlist(&request.playlist_id, None);
+    } = client.get_playlist(request).await.unwrap();
     let response = json!({
         "playlist": {
             "description": description,
             "followers": {
-                "total": followers.unwrap().total,
+                "total": followers.total,
             },
             "id": id,
             "image": images.first(),
@@ -155,9 +188,13 @@ pub async fn get_tracks(
     let refresh_token = session.get::<String>("refresh_token")?.unwrap();
 
     let mut client = PlaylistClient::new(&access_token, &refresh_token);
-    let tracks = client
-        .get_tracks(&request.playlist_id, None, None, None)
-        .get_items();
+
+    let get_request = spotify_api::playlist::GetPlaylistTracksRequest {
+        playlist_id: request.playlist_id,
+        ..Default::default()
+    };
+
+    let tracks = client.get_tracks(get_request).await.unwrap().get_items();
 
     let mut track_jsons = Vec::new();
     for track in tracks {
