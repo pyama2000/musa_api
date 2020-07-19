@@ -11,7 +11,7 @@ RUN cargo install --path .
 
 FROM debian:buster-slim
 EXPOSE 8000 8000
-RUN apt-get update && apt-get install -y libssl-dev libpq-dev
+RUN apt-get update && apt-get install -y libssl-dev libpq-dev ca-certificates
 COPY --from=builder /usr/local/cargo/bin/musa_api /usr/local/bin/musa_api
 
 CMD ["musa_api"]
